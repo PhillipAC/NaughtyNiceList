@@ -1,5 +1,6 @@
 from enum import Enum
 import hashlib
+import csv
 
 class ListStatus(Enum):
     NAUGHTY = 0,
@@ -25,10 +26,31 @@ class NaughtNiceList:
         else:
             print("Status could not be determined!")
 
+class Person:
+    def __init__(self, firstName, lastName, status):
+        self.firstName = firstName
+        self.lastName = lastName
+        self.status = status
+
 naughtNiceList = NaughtNiceList(2019)
 
-firstName = input('What is your first name?: ')
-lastName = input('What is your last name?: ')
+people = []
+niceSum = 0
+naughtySum = 0
 
-status = naughtNiceList.checkList(firstName, lastName)
-naughtNiceList.writeStatus(status)
+with open('nameList.csv', newline='') as nameList:
+    nameReader = csv.reader(nameList, delimiter=',', quotechar='"')
+    rowCount = 0
+    for row in nameReader:
+        if rowCount > 0:
+            firstName = row[0]
+            lastName = row[1]
+            status = naughtNiceList.checkList(firstName, lastName)
+            if status == ListStatus.NICE:
+                niceSum += 1
+            elif status == ListStatus.NAUGHTY:
+                naughtySum += 1
+            people.append(Person(firstName, lastName, status))
+        rowCount += 1
+
+print(f"Number of nice: {niceSum}, naughty: {naughtySum}")
